@@ -37,8 +37,9 @@ int main(void)
 
 	IspisiStudente(studenti, broj_studenata, max_bodovi);
 
-  getchar();
-  getchar();
+	getchar();
+   	getchar();
+	
 	return 0;
 }
 int BrojiStudente(char *datoteka)
