@@ -18,7 +18,7 @@ typedef struct _osoba {
 	char ime[MAX];
 	char prezime[MAX];
 	int godinaRodenja;
-	struct _osoba *next;
+	Osoba *next;
 }Osoba;
 
 Osoba *UnosPodataka(void);
@@ -32,27 +32,21 @@ int main(void)
 {
 	Osoba *Head;
 	Head = (Osoba*)malloc(sizeof(Osoba));
-	if (!Head)
-		return -1;
 	Head->next = NULL;
 
-	int status = 0;
-	do {
-		int opcija = 0;
-		Osoba *El = NULL;
-		char prezime[MAX] = { 0 };
+	int a;
+	Osoba *El = NULL;
+	char prezime[MAX] = { 0 };
 
-		printf("Odaberite zeljenu opciju: \n");
-		printf("1. Dodati novi element na pocetak liste\n");
-		printf("2. Ispisati listu\n");
-		printf("3. Dodati novi element na kraj liste\n");
-		printf("4. Pronaci element u listi (po prezimenu)\n");
-		printf("5. Brisati odredeni element\n");
-		printf("0. ZATVORI PROGRAM\n");
-		scanf("%d", &opcija);
+	printf("Odaberite zeljenu opciju: \n");
+	printf("1. Dodati novi element na pocetak liste\n");
+	printf("2. Ispisati listu\n");
+	printf("3. Dodati novi element na kraj liste\n");
+	printf("4. Pronaci element u listi (po prezimenu)\n");
+	printf("5. Brisati odredeni element\n");
+	scanf("%d", &a);
 
-		switch (opcija)
-		{
+	switch (a){
 		case(1):
 			UnosPocetak(UnosPodataka(), Head);
 			break;
@@ -73,13 +67,9 @@ int main(void)
 			scanf("%s", prezime);
 			BrisiElement(TraziElement(prezime, Head), Head);
 			break;
-		case(0):
-			return 1;
-		}
-
-
-	} while (!status);
-
+		default:
+			printf("Krivi unos");
+	}
 	return 0;
 }
 Osoba *UnosPodataka(void)
@@ -122,7 +112,7 @@ Osoba *TraziElement(char *prezime, Osoba *Head)
 {
 	Osoba *P = Head->next;
 
-	while (P != NULL && strcmp(P->prezime, prezime))
+	while (P != NULL && P->prezime != prezime)
 		P = P->next;
 
 	return P;
