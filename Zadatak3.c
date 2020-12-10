@@ -184,12 +184,50 @@ int DodajElementIspred(Osoba *Head, Osoba *El)
 	while (P != NULL && P->next != El)
 		P = P->next;
 
-	if (P == NULL) {
-		free(noviEl);
-		return -1;
+	DodajElementIza(P, unosPodataka());
+
+	return 0;
+}
+int SortirajPoPrezimenu(Osoba *Head)
+{
+	Osoba *x = Head->next;
+	Osoba *y = NULL;
+
+	while (Head->next != y) {
+		while (x->next != y) {
+			if (strcmp(x->prezime, x->next->prezime) > 0) {
+				ZamijeniPozicije(Head, x, x->next);
+			}
+			else
+				x = x->next;
+		}
+		y = PronadiPrethodniElement(Head, y);
+		x = Head->next;
 	}
 
-	DodajElementIza(P, unosPodataka());
+	return 0;
+}
+Osoba *PronadiZadnjiElement(Osoba *Head)
+{
+	return pronadiPrethodniElement(Head, NULL);
+}
+Osoba *PronadiPrethodniElement(Osoba *Head, Osoba *El)
+{
+	Osoba *P = Head;
+
+	while (P != NULL && P->next != El)
+		P = P->next;
+
+	return P;
+}
+int ZamijeniPozicije(Osoba *Head, Osoba *x, Osoba *y)
+{
+	Osoba *prethodni = PronadiPrethodniElement(Head, x);
+	Osoba *temp = y->next;
+
+	prethodni->next = y;
+	y->next = x;
+	x->next = temp;
 
 	return 0;
 }
