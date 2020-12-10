@@ -83,13 +83,13 @@ int main(void)
 	case (6):
 		printf("Unesi prezime: ");
 		scanf(" %s", prezime);
-		El = PronadiElement(Head, prezime);
+		El = TraziElement(Head, prezime);
 		DodajElementIza(El, unosPodataka());
 		break;
 	case (7):
 		printf("Unesi prezime: ");
 		scanf(" %s", prezime);
-		El = pronadiElement(Head, prezime);
+		El = TraziElement(Head, prezime);
 		DodajElementIspred(Head, El);
 		break;
 	case (8):
