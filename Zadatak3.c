@@ -6,7 +6,7 @@
 
 #define MAX 1000
 
-/*3.Prethodnom zadatku dodati funkcije:
+/*3. Prethodnom zadatku dodati funkcije:
 a) dinamički dodaje novi element iza određenog elementa,
 b) dinamički dodaje novi element ispred određenog elementa,
 c) sortira listu po prezimenima osoba,
