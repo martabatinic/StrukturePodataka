@@ -84,7 +84,7 @@ int main(void)
 		printf("Unesi prezime: ");
 		scanf(" %s", prezime);
 		El = TraziElement(Head, prezime);
-		DodajElementIza(El, unosPodataka());
+		DodajElementIza(El, UnosPodataka());
 		break;
 	case (7):
 		printf("Unesi prezime: ");
@@ -184,7 +184,7 @@ int DodajElementIspred(Osoba *Head, Osoba *El)
 	while (P != NULL && P->next != El)
 		P = P->next;
 
-	DodajElementIza(P, unosPodataka());
+	DodajElementIza(P, UnosPodataka());
 
 	return 0;
 }
@@ -209,7 +209,7 @@ int SortirajPoPrezimenu(Osoba *Head)
 }
 Osoba *PronadiZadnjiElement(Osoba *Head)
 {
-	return pronadiPrethodniElement(Head, NULL);
+	return PronadiPrethodniElement(Head, NULL);
 }
 Osoba *PronadiPrethodniElement(Osoba *Head, Osoba *El)
 {
