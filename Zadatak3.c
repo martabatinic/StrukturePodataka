@@ -213,6 +213,26 @@ int SpremiUDatoteku(Osoba *Head, char *filename)
 }
 int UcitajIzDatoteke(Osoba *Head, char *filename)
 {
+	FILE * fp;
+	int brojOsoba = 0, i = 0;
+	Osoba *P = PronadiZadnjiElement(Head);
+	Osoba *noviEl = (Osoba*)malloc(sizeof(Osoba));
+	char buffer[MAX] = { 0 };
 
+	fp = fopen(filename, "r");
+
+	while (fgets(buffer, MAX, fp)) ////reads a line from the specified stream and stores it into the string pointed to
+		brojOsoba++;
+
+	for (i = 0; i < brojOsoba; i++) {
+		noviEl->next = NULL;
+		P->next = noviEl;
+		P = P->next;
+
+		fscanf(fp, "%s %s %d", noviEl->ime, noviEl->prezime, &(noviEl->godinaRodenja));
+	}
+
+	fclose(fp);
+
+	return 0;
 }
-
