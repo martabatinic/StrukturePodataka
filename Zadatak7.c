@@ -24,8 +24,6 @@ int main()
 	Head->next = NULL;
 
 	char filename[MAX];
-
-
 	printf("Unesite ime datoteke: ");
 	scanf("%s", filename);
 
@@ -50,4 +48,5 @@ int PostfixIzraz(Element *Head, char *filename)
 	while () {
 		
 	}
-	
+	return 0;
+}
