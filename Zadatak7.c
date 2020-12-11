@@ -37,12 +37,9 @@ int PostfixIzraz(Element *Head, char *filename)
 {
 	FILE *fp = NULL;
 	char buffer[MAX];
-	char *pbuffer = buffer;
-
 	fp = fopen(filename, "r");
 
 	fgets(buffer, MAX, fp);  //reads a line from the specified stream and stores it into the string pointed
-
 	fclose(fp);
 
 	while () {
