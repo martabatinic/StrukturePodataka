@@ -63,7 +63,7 @@ int Ucitaj(Polinom *P)
 	Polinom *temp = NULL;
 	q = (Polinom*)malloc(sizeof(Polinom));
 	temp = P;
-	char* filename;
+	char *filename;
 
 	FILE* fp = NULL;
 	fp = fopen(filename, "r");
