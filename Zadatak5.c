@@ -62,7 +62,7 @@ int Ucitaj(Lista *Head)
 	Lista *q = NULL;
 	char *filename;
 
-	FILE* fp = NULL;
+	FILE *fp = NULL;
 	fp = fopen(filename, "r");
 
 	if (fp == NULL) {
@@ -78,10 +78,10 @@ int Ucitaj(Lista *Head)
 
 	return 0;
 }
-Lista* Stvori(Lista *Head)
+Lista *Stvori(Lista *Head)
 {
-	Lista* q;
-	Lista* p;
+	Lista *q;
+	Lista *p;
 	q = (Lista*)malloc(sizeof(Lista));
 
 	p = PronadiZadnji(Head);
