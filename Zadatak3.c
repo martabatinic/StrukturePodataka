@@ -26,7 +26,7 @@ int IspisListe(Osoba *Head);
 int UnosKraj(Osoba *El, Osoba *Head);
 Osoba *TraziElement(char *prezime, Osoba *Head);
 int BrisiElement(Osoba *El, Osoba *Head);
-int DodajElementIza(Osoba *El, Osoba * noviEl);
+int DodajElementIza(Osoba *El, Osoba *noviEl);
 int DodajElementIspred(Osoba *Head, Osoba *El);
 int SortirajPoPrezimenu(Osoba *Head);
 int SpremiUDatoteku(Osoba *Head, char *filename);
