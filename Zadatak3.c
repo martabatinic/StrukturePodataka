@@ -134,6 +134,7 @@ int IspisListe(Osoba *Head)
 		printf("%s %s %d", P->ime, P->prezime, P->godinaRodenja);
 		P = P->next;
 	}
+	return 0;
 }
 int UnosKraj(Osoba *El, Osoba *Head)
 {
