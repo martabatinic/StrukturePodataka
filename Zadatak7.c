@@ -9,8 +9,7 @@ rezultat. Stog je potrebno realizirati preko vezane liste.*/
 
 #define MAX 1024
 
-typedef struct _element
-{
+typedef struct _element{
 	float broj;
 	struct Element *next;
 } Element;
