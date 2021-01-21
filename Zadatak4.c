@@ -6,6 +6,10 @@
 
 #define MAX 512
 
+/*Napisati program za zbrajanje i množenje polinoma. Koeficijenti i eksponenti se
+čitaju iz datoteke.
+Napomena: Eksponenti u datoteci nisu nužno sortirani.*/
+
 typedef struct _polinom {
 	int koeficijent;
 	int eksponent;
