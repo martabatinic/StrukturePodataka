@@ -33,7 +33,7 @@ int main()
 	Lista *HeadPresjek = (Lista*)malloc(sizeof(Lista));
 
 	Head1->next = NULL;
-	Head2->element = NULL;
+	Head2->next = NULL;
 	HeadUnija->next = NULL;
 	HeadPresjek->next = NULL;
 
