@@ -77,7 +77,7 @@ Osoba *UnosPodataka(void)
 	Osoba *P = (Osoba*)malloc(sizeof(Osoba));
 
 	printf("Unesite ime, prezime i godinu rodenja: \n");
-	scanf("%s %s %d", P->ime, P->prezime, P->godinaRodenja);
+	scanf("%s %s %d", P->ime, P->prezime, &(P->godinaRodenja));
 
 	return P;
 }
