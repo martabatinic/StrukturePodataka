@@ -145,7 +145,7 @@ Stablo *Pronadi(Stablo *Root, int x)
 	}
 
 	else if (x > Root->element) {
-		return Find(Root->desno, x);
+		return Pronadi(Root->desno, x);
 	}
 
 	else if (x < Root->element) {
