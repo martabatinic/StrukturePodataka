@@ -135,25 +135,24 @@ void Ispisi(Stablo *Root, int x) {
 
 Stablo *Pronadi(Stablo *Root, int x)
 {
-	Stablo *Cvor;
-	Cvor = Root;
+	
 
-	if (Cvor == NULL)
+	if (Root == NULL)
 		return NULL;
 
-	else if (Cvor->element == Pronadi) {
+	else if (Root->element == x) {
 		return Cvor;
 	}
 
-	else if (Pronadi > Cvor->element) {
-		return Find(Cvor->desno, Pronadi);
+	else if (x > Root->element) {
+		return Find(Root->desno, x);
 	}
 
-	else if (Pronadi < Cvor->element) {
-		return Pronadi(Cvor->lijevo, Pronadi);
+	else if (x < Root->element) {
+		return Pronadi(Root->lijevo, x);
 	}
 
-	return Cvor;
+	return Root;
 }
 
 Stablo *PronadiNajmanji(Stablo *Root)
