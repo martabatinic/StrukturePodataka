@@ -43,11 +43,6 @@ int main(void)
 	printf("3. Dodati novi element na kraj liste\n");
 	printf("4. Pronaci element u listi (po prezimenu)\n");
 	printf("5. Brisati odredeni element\n");
-	printf("6. Dodati element iza nekog elementa\n");
-	printf("7. Dodati element ispred nekog elementa\n");
-	printf("8. Sortirati listu\n");
-	printf("9. Spremiti listu u datoteku\n");
-	printf("10. Ucitati listu iz datoteke\n");
 	scanf("%d", &a);
 
 	switch (a) {
