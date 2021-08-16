@@ -16,16 +16,16 @@ kojem su sortirane.*/
 
 typedef struct _lista {
 	int element;
-	Lista *next;
+	struct _lista *next;
 }Lista;
 
 int Unos(Lista *Head);
 int Sortiraj(Lista *Head, int El);
 int Ispis(Lista *Head);
-int IzracunajUniju(Lista *Head1, Lista *Head2, Lista *HeadUnija);
-int IzracunajPresjek(Lista *Head1, Lista *Head2, Lista *HeadPresjek);
+int Unija(Lista *Head1, Lista *Head2, Lista *HeadUnija);
+int Presjek(Lista *Head1, Lista *Head2, Lista *HeadPresjek);
 
-int main()
+int main(void)
 {
 	Lista *Head1 = (Lista*)malloc(sizeof(Lista));
 	Lista *Head2 = (Lista*)malloc(sizeof(Lista));
@@ -40,38 +40,35 @@ int main()
 	Unos(Head1);
 	Ispis(Head1);
 	Unos(Head2);
-	Ispis(Head2); 
+	Ispis(Head2);
 
-	IzracunajUniju(Head1, Head2, HeadUnija);
-	printf("Unija listi:\n");
+	Unija(Head1, Head2, HeadUnija);
 	Ispis(HeadUnija);
 
-	IzracunajPresjek(Head1, Head2, HeadPresjek);
-	printf("Presjek listi:\n");
+	Presjek(Head1, Head2, HeadPresjek);
 	Ispis(HeadPresjek);
 
 	return 0;
 }
-int Unos(Lista *Head)
-{
-	int n = 0, El = 0;
+int Unos(Lista *Head) {
+	int a = 0, El = 0;
 
-	printf("Unesite broj elemenata liste:\n");
-	scanf("%d", &n);
+	printf("Unesite broj elemenata liste: \n");
+	scanf("%d", &a);
 
-	for (int i = 0; i < n; i++) {
-		printf("Unesi: [%d.] \t", i + 1);
+	for (int i = 0; i < a; i++) {
+		printf("Unesite %d. element liste:\t", i+1);
 		scanf("%d", &El);
 		Sortiraj(Head, El);
 	}
+
 	return 0;
 }
-int Sortiraj(Lista *Head, int El)
-{
-	Lista *P = Head;
+int Sortiraj(Lista *Head, int El) {
+	Lista *P = Head->next;
 	Lista *noviEl = (Lista*)malloc(sizeof(Lista));
 
-	while (P->next != NULL && P->next->element < El)
+	while (P != NULL && P->element < El)
 		P = P->next;
 
 	noviEl->next = P->next;
@@ -80,35 +77,33 @@ int Sortiraj(Lista *Head, int El)
 
 	return 0;
 }
-int Ispis(Lista *Head)
-{
+int Ispis(Lista *Head) {
 	Lista *P = Head->next;
+
 	while (P != NULL) {
-		printf("%d ", P->element);
+		printf("%d \t", P->element);
 		P = P->next;
 	}
-	printf("\n");
 
 	return 0;
 }
-int IzracunajUniju(Lista *Head1, Lista *Head2, Lista *HeadUnija)
-{
-	Head1 = Head1->next;
-	Head2 = Head2->next;
+int Unija(Lista *Head1, Lista *Head2, Lista *HeadUnija) {
+	Lista *pHead1 = Head1->next;
+	Lista *pHead2 = Head2->next;
 
-	while (Head1 != NULL && Head2 != NULL) {
-		if (Head1->element > Head2->element) {
-			HeadUnija = Sortiraj(HeadUnija, Head2->element);
-			Head2=Head2->next;
+	while (pHead1 != NULL && pHead2 != NULL) {
+		if (pHead1->element > pHead2->element) {
+			Sortiraj(HeadUnija, pHead2->element);
+			pHead2 = pHead2->next;
 		}
-		else if (Head1->element < Head2->element) {
-			HeadUnija = Sortiraj(HeadUnija, Head1->element);
-			Head1 = Head1->next;
+		else if(pHead1->element < pHead2->element) {
+			Sortiraj(HeadUnija, pHead1->element);
+			pHead1 = pHead2->next;
 		}
 		else {
-			HeadUnija = Sortiraj(HeadUnija, Head1->element);
-			Head1 = Head1->next;
-			Head2 = Head2->next;
+			Sortiraj(HeadUnija, pHead1->element);
+			pHead1 = pHead2->next;
+			pHead2 = pHead2->next;
 		}
 	}
 	if (Head1 == NULL) {
@@ -126,8 +121,7 @@ int IzracunajUniju(Lista *Head1, Lista *Head2, Lista *HeadUnija)
 
 	return 0;
 }
-int IzracunajPresjek(Lista *Head1, Lista *Head2, Lista *HeadPresjek)
-{
+int Presjek(Lista *Head1, Lista *Head2, Lista *HeadPresjek){
 	Head1 = Head1->next;
 	Head2 = Head2->next;
 
