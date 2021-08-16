@@ -9,30 +9,28 @@ rezultat. Stog je potrebno realizirati preko vezane liste.*/
 
 #define MAX 1024
 
-typedef struct _element{
+typedef struct _element {
 	float broj;
-	struct Element *next;
+	struct _element *next;
 } Element;
 
 int Push(Element *Head, float broj);
 float Pop(Element *Head);
-int IzracunajPostfix(Element *Head, char *filename);
+int IzracunajPostfix(Element *Head, char *datoteka);
 int IzracunajOperaciju(Element *Head, char operator);
+
 
 int main()
 {
 	Element *Head = (Element*)malloc(sizeof(Element));
-
-	if (!Head)
-		return -1;
-
 	Head->next = NULL;
-	char filename[MAX];
+
+	char datoteka[MAX];
 
 	printf("Unesi ime datoteke s postfix izrazom: ");
-	scanf("%s", filename);
+	scanf("%s", datoteka);
 
-	IzracunajPostfix(Head, filename);
+	IzracunajPostfix(Head, datoteka);
 
 	if (!Head->next)
 		return -1;
@@ -41,38 +39,10 @@ int main()
 
 	return 0;
 }
-
-int Push(Element *Head, float broj)
-{
-	Element *noviEl = (Element*)malloc(sizeof(Element));
-
-	if (!noviEl)
-		return -1;
-
-	noviEl->next = Head->next;
-	Head->next = noviEl;
-	noviEl->broj = broj;
-
-	return 0;
-}
-
-float Pop(Element *Head)
-{
-	float broj = Head->next->broj;
-	Element *temp = Head->next;
-	Head->next = Head->next->next;
-
-	free(temp);
-	return broj;
-}
-
-int IzracunajPostfix(Element *Head, char *filename)
-{
+int IzracunajPostfix(Element *Head, char *filename){
 	FILE *fp = NULL;
 	char buffer[MAX];
-	char *pBuffer = buffer;
-	float operand1 = 0;
-	float operand2 = 0;
+	char *pbuffer = buffer;
 
 	fp = fopen(filename, "r");
 
@@ -83,29 +53,51 @@ int IzracunajPostfix(Element *Head, char *filename)
 
 	fclose(fp);
 
-	while (strlen(pBuffer) > 0)
+	while (strlen(pbuffer) > 0)
 	{
 		char operator= 0;
 		int offset = 0;
 		float broj = 0;
-		if (sscanf(pBuffer, " %f%n", &broj, &offset) == 1)
+		if (sscanf(pbuffer, " %f%n", &broj, &offset) == 1)
 		{
-			pushStack(Head, broj);
-			pBuffer += offset;
+			Push(Head, broj);
+			pbuffer += offset;
 		}
 		else
 		{
-			sscanf(pBuffer, " %c%n", &operator, &offset);
-			izracunajOperaciju(Head, operator);
-			pBuffer += offset;
+			sscanf(pbuffer, " %c%n", &operator, &offset);
+			IzracunajOperaciju(Head, operator);
+			pbuffer += offset;
 		}
 	}
 
 	return 0;
 }
+int Push(Element *Head, float broj) {
+	Element *P = Head;
+	Element *noviEl = (Element*)malloc(sizeof(Element));
 
-int IzracunajOperaciju(Element* Head, char operator)
-{
+	noviEl->next = P->next;
+	P->next = noviEl;
+	noviEl->broj = broj;
+
+	return 0;
+}
+float Pop(Element *HeadStog) {
+	float b = 0;
+	Element *P = HeadStog;
+	Element *temp = (Element*)malloc(sizeof(Element));
+
+	b = P->next->broj;
+
+	temp = P->next;
+	P->next = P->next->next;
+	free(temp);
+
+	return b;
+
+}
+int IzracunajOperaciju(Element* Head, char operator){
 	float operand1 = 0;
 	float operand2 = 0;
 
