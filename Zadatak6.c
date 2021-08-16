@@ -13,16 +13,16 @@ Napomena: Funkcija "push" sprema cijeli broj, slučajno generirani u opsegu od 1
 
 typedef struct _element {
 	int broj;
-	Element *next;
+	struct _element *next;
 }Element;
 
 int Random(void);
 int Push(Element *Head, int broj);
 int PopStog(Element *HeadStog);
 int PopRed(Element *HeadRed);
-void Ispis(Element *Head);
+int Ispis(Element *Head);
 
-int main()
+int main(void)
 {
 	Element *HeadStog = (Element*)malloc(sizeof(Element));
 	Element *HeadRed = (Element*)malloc(sizeof(Element));
@@ -30,7 +30,8 @@ int main()
 	HeadStog->next = NULL;
 	HeadRed->next = NULL;
 
-	int a = 0, b = 0;
+	int a = 0;
+	int b = 0;
 
 	printf("Odaberite zeljenu opciju:\n");
 	printf("1. Dodati broj u stog\n");
@@ -39,88 +40,89 @@ int main()
 	printf("4. Izbaciti broj iz reda\n");
 	scanf("%d", &a);
 
-	switch (a)
-	{
-	case(1):
-		b = Random();
-		Push(HeadStog, b);
-		printf("Dodani broj u stog: %d\n", b);
-		Ispis(HeadStog);
-		break;
-	case(2):
-		b = Random();
-		Push(HeadRed, b);
-		printf("Dodani broj u red: %d\n", b);
-		Ispis(HeadRed);
-		break;
-	case(3):
-		b = PopStog(HeadStog);
-		printf("Izbaceni broj u stogu: %d\n", b);
-		Ispis(HeadStog);
-		break;
-	case(4):
-		b = PopRed(HeadRed);
-		printf("Izbaceni broj u redu: %d\n", b);
-		Ispis(HeadRed);
-		break;
-	default:
-		printf("Krivi unos");
+	switch(a){
+		case(1):
+			b = Random();
+			Push(HeadStog, b);
+			printf("Dodali ste %d broj u stog.\n", b);
+			Ispis(HeadStog);
+			break;
+		case(2):
+			b = Random();
+			Push(HeadRed, b);
+			printf("Dodali ste %d broj u red.\n", b);
+			Ispis(HeadRed);
+			break;
+		case(3):
+			b = PopStog(HeadStog);
+			printf("Izbacili ste %d broj iz stog.\n", b);
+			Ispis(HeadStog);
+			break;
+		case(4):
+			b = PopRed(HeadRed);
+			printf("Izbacili ste %d broj iz reda.\n", b);
+			Ispis(HeadRed);
+			break;
+		default:
+			printf("Krivi unos");
+
 	}
 
 	return 0;
 }
-int Random(void)
-{
+int Random(void) {
 	int b = 0;
+
 	b = (rand() % 90) + 10;
 
 	return b;
 }
-int Push(Element *Head, int broj)
-{
+int Push(Element *Head, int broj) {
+	Element *P = Head;
 	Element *noviEl = (Element*)malloc(sizeof(Element));
 
-	noviEl->next = Head->next;
-	Head->next = noviEl;
+	noviEl->next = P->next;
+	P->next = noviEl;
 	noviEl = broj;
-
+	
 	return 0;
 }
-int PopStog(Element *HeadStog)
-{
-	Element *P = HeadStog;
-	Element *temp;
+int PopStog(Element *HeadStog) {
 	int b = 0;
+	Element *P = HeadStog;
+	Element *temp = (Element*)malloc(sizeof(Element));
 
 	b = P->next->broj;
+	
 	temp = P->next;
 	P->next = P->next->next;
 	free(temp);
 
 	return b;
 }
-int PopRed(Element *HeadRed)
-{
-	Element *P = HeadRed;
-	Element *temp;
+int PopRed(Element *HeadRed) {
 	int b = 0;
+	Element *P = HeadRed;
+	Element *temp = (Element*)malloc(sizeof(Element));
 
-	while (P->next->next != NULL)
+	while (P->next != NULL)
 		P = P->next;
 
 	b = P->next->broj;
+
 	temp = P->next;
 	P->next = NULL;
 	free(temp);
 
 	return b;
 }
-void Ispis(Element *Head)
-{
+int Ispis(Element *Head) {
 	Element *P = Head->next;
+
 	while (P != NULL) {
-		printf("%d \t", P->broj);
+		printf("%d\t", P->broj);
 		P = P->next;
 	}
+
 	return 0;
 }
