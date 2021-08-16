@@ -13,18 +13,16 @@ Napomena: Eksponenti u datoteci nisu nužno sortirani.*/
 typedef struct _polinom {
 	int koeficijent;
 	int eksponent;
-	Polinom *next;
+	struct _polinom *next;
 } Polinom;
 
 int UcitajIzDatoteke(Polinom *Head1, Polinom *Head2, char *fileName);
-int UmetniElementSortirano(Polinom *Head, int koeficijent, int eksponent);
-int ProcitajRed(Polinom *Head, char *red);
-Polinom *PronadiPrethodniElement(Polinom *Head, Polinom *Pozicija);
-int ZbrojiPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadSuma;
-int PomnoziPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadProdukt);
+int ProcitajRed(Polinom *Head, char *line);
+int UmetniElementSortirano(Polinom *Head, int koef, int eksp);
 int Ispis(Polinom *Head);
-int OcistiNulaElemente(Polinom *Head);
-
+int ZbrojiPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadSuma);
+int PomnoziPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadProdukt);
+int Ocisti(Polinom *Head);
 
 int main(void)
 {
@@ -45,14 +43,16 @@ int main(void)
 
 	UcitajIzDatoteke(Head1, Head2, fileName);
 
-	printf("Prvi polinom: \n\t");
+	printf("Prvi polinom: \n");
 	Ispis(Head1);
-	printf("\nDrugi polinom: \n\t");
+
+	printf("\nDrugi polinom: \n");
 	Ispis(Head2);
 
 	ZbrojiPolinome(Head1, Head2, HeadSuma);
 	printf("\nSuma polinoma: \n\t");
 	Ispis(HeadSuma);
+
 	PomnoziPolinome(Head1, Head2, HeadProdukt);
 	printf("\nUmnozak polinoma: \n\t");
 	Ispis(HeadProdukt);
@@ -60,7 +60,6 @@ int main(void)
 
 	return 0;
 }
-
 int UcitajIzDatoteke(Polinom *Head1, Polinom *Head2, char *fileName)
 {
 	FILE *fp = NULL;
@@ -75,13 +74,11 @@ int UcitajIzDatoteke(Polinom *Head1, Polinom *Head2, char *fileName)
 	fclose(fp);
 	return 0;
 }
-
-int ProcitajRed(Polinom *Head, char *red)
-{
-	red[strlen(red)] = 0;
+int ProcitajRed(Polinom *Head, char *line) {
+	line[strlen(line)] = 0;
 	int koeficijent = 0;
 	int eksponent = 0;
-	char *pRed = red;
+	char *pRed = line;
 
 	do {
 		int n = 0;
@@ -90,21 +87,20 @@ int ProcitajRed(Polinom *Head, char *red)
 		pRed += n;
 
 		UmetniElementSortirano(Head, koeficijent, eksponent);
+
 	} while (strlen(pRed) > 1);
 
 	return 0;
 }
-
-int UmetniElementSortirano(Polinom *Head, int koeficijent, int eksponent)
-{
+int UmetniElementSortirano(Polinom *Head, int koef, int eksp) {
 	Polinom *P = Head;
 
-	while (P->next != NULL && P->next->eksponent > eksponent)
+	while (P->next != NULL && P->next->eksponent > eksp)
 		P = P->next;
 
-	if (P->next != NULL && P->next->eksponent == eksponent) {
-		P->next->koeficijent += koeficijent;
-	}
+	if (P->next != NULL && P->next->eksponent == eksp)
+		P->next->koeficijent += koef;
+
 	else {
 		Polinom *noviEl = (Polinom*)malloc(sizeof(Polinom));
 
@@ -114,60 +110,42 @@ int UmetniElementSortirano(Polinom *Head, int koeficijent, int eksponent)
 		noviEl->next = P->next;
 		P->next = noviEl;
 
-		noviEl->koeficijent = koeficijent;
-		noviEl->eksponent = eksponent;
+		noviEl->koeficijent = koef;
+		noviEl->eksponent = eksp;
 	}
 
 	return 0;
 }
-
-
-Polinom *PronadiPrethodniElement(Polinom *Head, Polinom *Pozicija)
-{
-	Polinom *P = Head;
-
-	while (P != NULL && P->next != Pozicija)
-		P = P->next;
-
-	return P;
-}
-
-int Ispis(Polinom *Head)
-{
+int Ispis(Polinom *Head) {
 	Polinom *P = Head->next;
 
 	while (P != NULL) {
-		printf("%dx^%d", P->koeficijent, P->eksponent);
+		printf("%d x^ %d\n", P->koeficijent, P->eksponent);
 		if (P->next != NULL)
-			printf(" + ");
+			printf("+");
 		P = P->next;
 	}
 
 	return 0;
 }
-
-int ZbrojiPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadSuma)
-{
+int ZbrojiPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadSuma) {
 	Polinom *pHead1 = Head1->next;
 	Polinom *pHead2 = Head2->next;
 
 	while (pHead1 != NULL) {
 		UmetniElementSortirano(HeadSuma, pHead1->koeficijent, pHead1->eksponent);
-		pHead1 = pHead1->next;
+		Head1 = Head1->next;
 	}
-
 	while (pHead2 != NULL) {
 		UmetniElementSortirano(HeadSuma, pHead2->koeficijent, pHead2->eksponent);
-		pHead2 = pHead2->next;
+		Head1 = Head1->next;
 	}
 
-	OcistiNulaElemente(HeadSuma);
+	Ocisti(HeadSuma);
 
 	return 0;
 }
-
-int PomnoziPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadProdukt)
-{
+int PomnoziPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadProdukt) {
 	Polinom *pHead1 = Head1->next;
 	Polinom *pHead2 = Head2->next;
 
@@ -180,14 +158,12 @@ int PomnoziPolinome(Polinom *Head1, Polinom *Head2, Polinom *HeadProdukt)
 		pHead1 = pHead1->next;
 	}
 
-	OcistiNulaElemente(HeadProdukt);
+	Ocisti(HeadProdukt);
 
 	return 0;
 }
-
-int OcistiNulaElemente(Polinom *Head)
-{
-	Polinom *P= Head;
+int Ocisti(Polinom *Head){
+	Polinom *P = Head;
 	Polinom *temp;
 
 	while (P->next != NULL) {
