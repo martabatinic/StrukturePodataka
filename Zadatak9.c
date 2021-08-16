@@ -6,195 +6,146 @@
 #include<ctype.h>
 
 #define MAX 1024
-#define razmak 10
 
 /*9. Napisati program koji omogućava rad s binarnim stablom pretraživanja. Treba
 omogućiti unošenje novog elementa u stablo, ispis elemenata, brisanje i pronalaženje
 nekog elementa.*/
 
 typedef struct _stablo {
-	int element;
-	Stablo *lijevo;
-	Stablo *desno;
-} Stablo;
+	int broj;
+	struct _stablo *lijevo;
+	struct _stablo *desno;
+}Stablo;
 
-int Menu();
-Stablo *Operacija(Stablo *Root);
-int getNumber();
-Stablo *Unesi(Stablo *Root, int element);
-void Ispisi(Stablo *Root, int x);
-Stablo *Pronadi(Stablo *Root, int x);
-Stablo *PronadiNajmanji(Stablo *Root);
-Stablo *Izbrisi(const Stablo *Root, Stablo *R);
+int getNumber(void);
+Stablo *Unesi(Stablo *Root, int broj);
+Stablo *AlocirajNovoStablo(int broj);
+int Ispis(Stablo *Root, int razmak);
+Stablo *IzbrisiElement(Stablo *Root, Stablo *El);
+Stablo *TraziElement(Stablo *Root, int broj);
+Stablo *PronadiMin(Stablo *Node);
 
-int main()
+int main(void)
 {
 	Stablo *Root = NULL;
-	
-	do
-	{
-		Menu();
-		Root = Operacija(Root);
+
+	do {
+		int a = 0;
+
+		printf("Odaberite: \n");
+		printf("1. - Unesi novi cvor\n");
+		printf("2. - Ispisi elemente stabla\n");
+		printf("3. - Izbrisi element stabla\n");
+		printf("4. - Pronadi element stabla\n");
+		printf("0. - Zatvori program\n");
+		scanf("%d", &a);
+
+		switch (a){
+			case (1):
+				Root = Unesi(Root, getNumber());
+				break;
+			case(2):
+				Ispis(Root, 10);
+				break;
+			case(3):
+				Root = IzbrisiElement(Root, TraziElement(Root, getNumber()));
+				break;
+			case(4):
+				Root = TraziElement(Root, getNumber());
+				break;
+			default:
+					printf("Krivi unos!\n");
+				
+			
+		}
+
 	} while (Root);
 
 	return 0;
 }
-
-int Menu() {
-	printf("Odaberite:\n");
-	printf("1. - Unesi novi cvor\n");
-	printf("2. - Ispisi elemente stabla\n");
-	printf("3. - Izbrisi element stabla\n");
-	printf("4. - Ponovo ispisi izbornik\n");
-	printf("0. - Zatvori program\n");
-	
-	return 0;
-}
-
-Stablo *Operacija(Stablo *Root) {
-	int x = 0;
-	Stablo* S;
-
-	printf("Vas izbor -> ");
-	scanf(" %d", &x);
-
-	switch (x) {
-	case 1:
-		Root = Unesi(Root, getNumber());
-		return Root;
-
-	case 2:
-		Ispisi(Root, 0);
-		return Root;
-
-	case 3:
-		S = Pronadi(Root, getNumber());
-		Izbrisi(Root, S);
-		return Root;
-
-	case 4:
-		Menu();
-		return Root;
-
-	case 0:
-		return NULL;
-
-	default:
-		printf("Krivi unos!\n");
-	}
-}
-
-int getNumber()
-{
+int getNumber(void){
 	int n;
-	printf("Unesite broj: ");
-	scanf(" %d", &n);
+
+	printf("Unesite broj: \n");
+	scanf("%d", &n);
 
 	return n;
 }
-
-Stablo *Unesi(Stablo *Root, int element)
-{
-	if (Root == NULL) {
-		Root = (Stablo*)malloc(sizeof(Stablo));
-
-		Root->element = element;
-		Root->lijevo = NULL;
-		Root->desno= NULL;
-
-		return Root;
-	}
-	else if (element > Root->element) {
-		Root->desno = Unesi(Root->desno, element);
-	}
-	else if (element < Root->element) {
-		Root->lijevo = Unesi(Root->lijevo, element);
-	}
+Stablo *Unesi(Stablo *Root, int broj) {
+	if (!Root)
+		Root = AlocirajNovoStablo(broj);
+	else if (broj < Root->broj)
+		Root->lijevo = Unesi(Root->lijevo, broj);
+	else if (broj > Root->broj)
+		Root->desno = Unesi(Root->desno, broj);
 
 	return Root;
 }
+Stablo *AlocirajNovoStablo(int broj){
+	Stablo *noviRoot = malloc(sizeof(Stablo));
 
-void Ispisi(Stablo *Root, int x) {
+	noviRoot->broj = broj;
+	noviRoot->lijevo = NULL;
+	noviRoot->desno = NULL;
 
-	int i = 0;
+	return noviRoot;
+}
+int Ispis(Stablo *Root, int razmak) {
+	Stablo *Node = (Stablo*)Root;
 
-	if (Root == NULL)
-		return -1;
+	Ispis(Node->desno, razmak + 10);
 
-	x += razmak;
-
-	Ispisi(Root->desno, x);
-
-	printf("\n");
-	for (i = razmak; i < x; i++)
+	for (int i = 0; i < razmak + 10; i++)
 		printf(" ");
-	printf("%d\n", Root->element);
 
-	Ispisi(Root->lijevo, x);
+	printf("%d\n", Node->broj);
+	Ispis(Node->lijevo, razmak + 10);
+
+	return 0;
 }
-
-Stablo *Pronadi(Stablo *Root, int x)
-{
-	
-
-	if (Root == NULL)
-		return NULL;
-
-	else if (Root->element == x) {
-		return Cvor;
-	}
-
-	else if (x > Root->element) {
-		return Pronadi(Root->desno, x);
-	}
-
-	else if (x < Root->element) {
-		return Pronadi(Root->lijevo, x);
-	}
-
-	return Root;
-}
-
-Stablo *PronadiNajmanji(Stablo *Root)
-{
-	if (Root == NULL)
-		return NULL;
-	else if (Root->lijevo == NULL)
-		return Root;
-
-	return PronadiNajmanji(Root->lijevo);
-}
-
-Stablo *Izbrisi(const Stablo *Root, Stablo *R)
-{
-	Stablo *Pomocna = (Stablo*)Root;
+Stablo *IzbrisiElement(Stablo *Root, Stablo *El) {
+	Stablo *Node = (Stablo *)Root;
 	Stablo *temp = NULL;
 
-	if (Pomocna == NULL)
+	if (!Node)
 		return NULL;
-
-	else if (R->element < Pomocna->element)
-		Pomocna->lijevo = Izbrisi(Pomocna->lijevo, R);
-
-	else if (R->element > Pomocna->element)
-		Pomocna->desno = Izbrisi(Pomocna->desno, R);
-
-	else if (Pomocna->lijevo && Pomocna->desno) {
-		temp = PronadiNajmanji(Pomocna->desno);
-		Pomocna->element = temp->element;
-		Pomocna->desno = Izbrisi(Pomocna->desno, Pomocna);
+	else if (El->broj < Node->broj)
+		Node->lijevo = IzbrisiElement(Node->lijevo, El);
+	else if (El->broj > Node->broj)
+		Node->desno = IzbrisiElement(Node->desno, El);
+	else if (Node->lijevo && Node->desno){
+		temp = PronadiMin(Node->desno); 
+		Node->broj = temp->broj;
+		Node->desno = IzbrisiElement(Node->desno, Node);
 	}
-
-	else {
-		temp = Pomocna;
-
-		if (Pomocna->lijevo == NULL)
-			Pomocna = Pomocna->desno;
+	else{
+		temp = Node;
+		if (!Node->lijevo)
+			Node = Node->desno;
 		else
-			Pomocna = Pomocna->lijevo;
-
+			Node = Node->lijevo;
 		free(temp);
 	}
 
-	return Pomocna;
+	return Node;
+}
+Stablo *TraziElement(Stablo *Root, int broj) {
+	Stablo *Node = (Stablo*)Root;
+	
+	if (!Node)
+		return NULL;
+	else if (broj < Node->broj)
+		Node = TraziElement(Node->lijevo, broj);
+	else if (broj > Node->broj)
+		Node = TraziElement(Node->desno, broj);
+
+	return Node;
+}
+Stablo *PronadiMin(Stablo *Node){
+	if (!Node)
+		return NULL;
+	else if (!Node->lijevo)
+		return Node;
+
+	return PronadiMin(Node->lijevo);
 }
