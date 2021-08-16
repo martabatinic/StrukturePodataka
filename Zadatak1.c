@@ -77,7 +77,9 @@ void UnesiStudente(char *datoteka, Student *studenti, int broj_studenata)
 void IspisiStudente(Student *studenti, int broj_studenata, int max_bodovi)
 {
 	for (int i = 0; i < broj_studenata; i++) {
+		
 		double rel = ((double)studenti[i].bodovi / max_bodovi) * 100;
+		
 		printf("Ime: %s\t", studenti[i].ime);
 		printf("Prezime: %s\t", studenti[i].prezime);
 		printf("Bodovi: %d\t", studenti[i].bodovi);
