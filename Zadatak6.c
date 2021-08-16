@@ -1,127 +1,128 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
-#include <malloc.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MAX 1000
+/*7. Napisati program koji iz datoteke čita postfiks izraz i zatim korištenjem stoga računa
+rezultat. Stog je potrebno realizirati preko vezane liste.*/
 
-/*6. Napisati program koji pomoću vezanih listi simulira rad:
-a) stoga,
-b) reda.
-Napomena: Funkcija "push" sprema cijeli broj, slučajno generirani u opsegu od 10 -100.*/
+#define MAX 1024
 
 typedef struct _element {
-	int broj;
+	float broj;
 	struct _element *next;
-}Element;
+} Element;
 
-int Random(void);
-int Push(Element *Head, int broj);
-int PopStog(Element *HeadStog);
-int PopRed(Element *HeadRed);
-int Ispis(Element *Head);
+int Push(Element *Head, float broj);
+float Pop(Element *Head);
+int IzracunajPostfix(Element *Head, char *datoteka);
+int IzracunajOperaciju(Element *Head, char operator);
 
-int main(void)
+
+int main()
 {
-	Element *HeadStog = (Element*)malloc(sizeof(Element));
-	Element *HeadRed = (Element*)malloc(sizeof(Element));
+	Element *Head = (Element*)malloc(sizeof(Element));
+	Head->next = NULL;
 
-	HeadStog->next = NULL;
-	HeadRed->next = NULL;
+	char datoteka[MAX];
 
-	int a = 0;
-	int b = 0;
+	printf("Unesi ime datoteke s postfix izrazom: ");
+	scanf("%s", datoteka);
 
-	printf("Odaberite zeljenu opciju:\n");
-	printf("1. Dodati broj u stog\n");
-	printf("2. Dodati broj u red\n");
-	printf("3. Izbaciti broj iz stoga\n");
-	printf("4. Izbaciti broj iz reda\n");
-	scanf("%d", &a);
+	IzracunajPostfix(Head, datoteka);
 
-	switch(a){
-		case(1):
-			b = Random();
-			Push(HeadStog, b);
-			printf("Dodali ste %d broj u stog.\n", b);
-			Ispis(HeadStog);
-			break;
-		case(2):
-			b = Random();
-			Push(HeadRed, b);
-			printf("Dodali ste %d broj u red.\n", b);
-			Ispis(HeadRed);
-			break;
-		case(3):
-			b = PopStog(HeadStog);
-			printf("Izbacili ste %d broj iz stog.\n", b);
-			Ispis(HeadStog);
-			break;
-		case(4):
-			b = PopRed(HeadRed);
-			printf("Izbacili ste %d broj iz reda.\n", b);
-			Ispis(HeadRed);
-			break;
-		default:
-			printf("Krivi unos");
+	if (!Head->next)
+		return -1;
 
+	printf("%.3f\n", Head->next->broj);
+
+	return 0;
+}
+int IzracunajPostfix(Element *Head, char *filename){
+	FILE *fp = NULL;
+	char buffer[MAX];
+	char *pbuffer = buffer;
+
+	fp = fopen(filename, "r");
+
+	if (!fp)
+		return -1;
+
+	fgets(buffer, MAX, fp);
+
+	fclose(fp);
+
+	while (strlen(pbuffer) > 0)
+	{
+		char operator= 0;
+		int offset = 0;
+		float broj = 0;
+		if (sscanf(pbuffer, " %f%n", &broj, &offset) == 1)
+		{
+			Push(Head, broj);
+			pbuffer += offset;
+		}
+		else
+		{
+			sscanf(pbuffer, " %c%n", &operator, &offset);
+			IzracunajOperaciju(Head, operator);
+			pbuffer += offset;
+		}
 	}
 
 	return 0;
 }
-int Random(void) {
-	int b = 0;
-
-	b = (rand() % 90) + 10;
-
-	return b;
-}
-int Push(Element *Head, int broj) {
+int Push(Element *Head, float broj) {
 	Element *P = Head;
 	Element *noviEl = (Element*)malloc(sizeof(Element));
 
 	noviEl->next = P->next;
 	P->next = noviEl;
-	noviEl = broj;
-	
+	noviEl->broj = broj;
+
 	return 0;
 }
-int PopStog(Element *HeadStog) {
-	int b = 0;
+float Pop(Element *HeadStog) {
+	float b = 0;
 	Element *P = HeadStog;
 	Element *temp = (Element*)malloc(sizeof(Element));
 
 	b = P->next->broj;
-	
+
 	temp = P->next;
 	P->next = P->next->next;
 	free(temp);
 
 	return b;
+
 }
-int PopRed(Element *HeadRed) {
-	int b = 0;
-	Element *P = HeadRed;
-	Element *temp = (Element*)malloc(sizeof(Element));
+int IzracunajOperaciju(Element* Head, char operator){
+	float operand1 = 0;
+	float operand2 = 0;
 
-	while (P->next != NULL)
-		P = P->next;
-
-	b = P->next->broj;
-
-	temp = P->next;
-	P->next = NULL;
-	free(temp);
-
-	return b;
-}
-int Ispis(Element *Head) {
-	Element *P = Head->next;
-
-	while (P != NULL) {
-		printf("%d\t", P->broj);
-		P = P->next;
+	switch (operator)
+	{
+	case ('*'):
+		operand1 = Pop(Head);
+		operand2 = Pop(Head);
+		Push(Head, operand1 * operand2);
+		break;
+	case ('/'):
+		operand1 = Pop(Head);
+		operand2 = Pop(Head);
+		Push(Head, operand2 / operand1);
+		break;
+	case ('+'):
+		operand1 = Pop(Head);
+		operand2 = Pop(Head);
+		Push(Head, operand1 + operand2);
+		break;
+	case ('-'):
+		operand1 = Pop(Head);
+		operand2 = Pop(Head);
+		Push(Head, operand2 - operand1);
+		break;
 	}
 
 	return 0;
