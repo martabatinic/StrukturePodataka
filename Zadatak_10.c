@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -9,161 +10,153 @@
 /*10. Napisati program koji iz datoteke čita postfiks izraz i zatim stvara stablo proračuna.Iz
 gotovog stabla proračuna upisati u datoteku infiks izraz.*/
 
-typedef struct _node{
-	char element[ELEMENT];
-	Node *lijevo;
-	Node *desno;
-} Node;
+typedef struct _stablo {
+	char element[MAX];
+	struct _stablo *lijevo;
+	struct _stablo *desno;
+}Stablo;
 
-typedef struct _stack{
-	char element[ELEMENT];
-	Stack *next;
-} Stack;
+typedef struct _stog {
+	char element[MAX];
+	struct _stog *next;
+}Stog;
 
-int PostfixToStack(Stack *StackRoot, char *buffer);
-int ProcitajIzDatoteke(Stack *StackRoot, char *filename);
-int Operand(char element);
-int PushStack(Stack *Head, char *znak);
-char *PopStack(Stack *Head);
-Node *StackToTree(Stack *Head, Node *Root);
-Node *Alociranje(void);
-int InorderIspis(Node *Root);
+Stablo* StvoriStablo(void);
+int UcitajDatoteku(Stog *Head);
+int UcitajPostfixIzraz(Stog *Head, char *buffer);
+int Push(Stog *Head, char *znak);
+Stablo *Proracun(Stablo *Root, Stog *Head);
+char *Pop(Stog* Head);
+int ProvjeraZnaka(char znak);
+int InorderIspis(Stablo *Root);
 
-int main(void)
+int main()
 {
-	char filename[MAX];
-	Stack *Head = (Stack*)malloc(sizeof(Stack));
-
-	Node *Root = Alociranje();
+	Stog *Head = (Stog*)malloc(sizeof(Stog));
 	Head->next = NULL;
-	memset(Head->element, 0, ELEMENT);
 
-	printf("Unesite ime datoteke: ");
-	scanf(" %s", filename);
+	if (!Head)
+		printf("Greska u alokaciji memorije <head stog>!\n");
 
-	ProcitajIzDatoteke(Head, filename);
+	memset(Head->element, '0', MAX);     //The memset() function returns str, the pointer to the destination string. 
 
-	Root = StackToTree(Head, Root);
+	Stablo *Root;
+	Root = StvoriStablo();
+
+	UcitajDatoteku(Head);
+
+	Root = Proracun(Root, Head);
 
 	InorderIspis(Root);
 
 	return 0;
 }
+Stablo* StvoriStablo(void){
+	Stablo *Root = (Stablo*)malloc(sizeof(Stablo));
 
-int ProcitajIzDatoteke(Stack *StackRoot, char *filename)
-{
+	if (!Root)
+		printf("Greska u alokaciji memorije <stablo novi>!\n");
+
+	Root->lijevo = NULL;
+	Root->desno= NULL;
+
+	return Root;
+}
+int UcitajDatoteku(Stog *Head) {
+	char datoteka[MAX];
+	char buffer[MAX];
+
+	memset(buffer, '0', MAX);
+
+	printf("Kako se zove datoteka koju zelite procitati? ");
+	scanf("%s", &datoteka);
+
+	if (strchr(datoteka, '.') == NULL) //If '.' is found, a pointer to it is returned. If not, NULL is returned.
+		strcat(datoteka, ".txt");
+
 	FILE *fp = NULL;
-	char buffer[MAX] = { 0 };
-	fp = fopen(filename, "r");
+	fp = fopen(datoteka, "r");
 
-	if (!fp)
-	{
-		printf("Datoteka nije otvorena.\n");
-		return -1;
-	}
+	if (fp == NULL)
+		printf("Greska u otvaranju datoteke!\n");
 
 	fgets(buffer, MAX, fp);
-	PostfixToStack(StackRoot, buffer);
+
+	UcitajPostfixIzraz(Head, buffer);
 
 	return 0;
 }
+int UcitajPostfixIzraz(Stog *Head, char *buffer) {
+	int pomak = 0;
+	char znak[MAX];
 
-int PostfixToStack(Stack *StackRoot, char *buffer)
-{
-	int offset = 0;
-	char znak[ELEMENT] = { 0 };
+	memset(znak, '0', MAX);
 
-	while (sscanf(buffer, " %s %n", znak, &offset) == 1)
-	{
-		PushStack(StackRoot, znak);
-		buffer += offset;
-		offset = 0;
-	}
+	while (sscanf(buffer, " %s %n", znak, &pomak) == 1) {
+		Push(Head, znak);
 
-	return 0;
-}
-
-int Operand(char element)
-{
-	switch (element)
-	{
-	case '+':
-	case '-':
-	case '*':
-	case '/':
-		return 1;
+		buffer += pomak;
+		pomak = 0;
 	}
 	return 0;
 }
+int Push(Stog *Head, char *znak) {
+	Stog *P = (Stog*)malloc(sizeof(Stog));
 
-int PushStack(Stack *Head, char *znak)
-{
-	Stack *noviEl = (Stack*)malloc(sizeof(Stack));
-
-	if (!noviEl)
-		return -1;
-
-	noviEl->next = Head->next;
-	Head->next = noviEl;
-	strcpy(noviEl->element, znak);
+	P->next = Head->next;
+	Head->next = P;
+	strcpy(P->element, znak);
 
 	return 0;
 }
+Stablo *Proracun(Stablo *Root, Stog *Head) {
+	char *string = Pop(Head);
 
-char *PopStack(Stack *Head)
-{
-	char *tempStr = malloc(sizeof(char));
+	Root = StvoriStablo();
 
-	if (!Head->next)
-		return NULL;
+	strcpy(Root->element, string);
 
-	Stack *temp = Head->next;
-	strcpy(tempStr, temp->element);
-
-	Head->next = Head->next->next;
-	free(temp);
-
-	return tempStr;
-}
-
-Node *StackToTree(Stack *Head, Node *Root)
-{
-	char *element = PopStack(Head);
-
-	Root = Alociranje();
-
-	if (!element)
-		return NULL;
-
-	strcpy(Root->element, element);
-
-	if (Operand(Root->element[0])) {
-		Root->desno = StackToTree(Head, Root->desno);
-		Root->lijevo = StackToTree(Head, Root->lijevo);
+	if (ProvjeraZnaka(Root->element[0])) {
+		Root->desno = Proracun(Root->desno, Head);
+		Root->lijevo = Proracun(Root->lijevo, Head);
 	}
 
 	return Root;
 }
+char *Pop(Stog* Head){
+	char pomocni[MAX];
 
-Node *Alociranje(void)
-{
-	Node *noviNode = (Node*)malloc(sizeof(Node));
-	noviNode->lijevo = NULL;
-	noviNode->desno = NULL;
+	if (Head->next == NULL) 
+		printf("Greska, prazan stog!\n");
 
-	return noviNode;
+	Stog *temp;
+
+	temp = Head->next;
+	strcpy(pomocni, temp->element);
+	Head->next = Head->next->next;
+	free(temp);
+
+	return pomocni;
 }
+int ProvjeraZnaka(char znak){
+	if (znak == '+')
+		return 1;
+	else if (znak == '-')
+		return 1;
+	else if (znak == '*')
+		return 1;
+	else if (znak == '/')
+		return 1;
 
-int InorderIspis(Node *Root)
-{
-	if (!Root)
+	else
 		return 0;
-
-	printf("(");
-	InorderIspis(Root->lijevo);
-	printf("%s", Root->element);
+}
+int InorderIspis(Stablo *Root) {
 	InorderIspis(Root->desno);
-	printf(")");
+
+	printf("%s", Root->element);
+
+	InorderIspis(Root->lijevo);
 
 	return 0;
 }
