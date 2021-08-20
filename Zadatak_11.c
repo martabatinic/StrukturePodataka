@@ -143,8 +143,7 @@ Student *Sortirano(Student *Head, char *ime, char *prezime){
 
 	return P;
 }
-Student *Rewind(Student* Head, char* prezime)
-{
+Student *Rewind(Student* Head, char* prezime){
 	Student *Element = prezime;
 
 	while (strcmp(Element->next->prezime, prezime))
