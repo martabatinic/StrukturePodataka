@@ -1,145 +1,250 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX 256
+/*8. Napisati program koji pomoću vezanih listi (stabala) predstavlja strukturu direktorija.
+Omogućiti unos novih direktorija i pod-direktorija, ispis sadržaja direktorija i
+povratak u prethodni direktorij. Točnije program treba preko menija simulirati
+korištenje DOS naredbi: 1- "md", 2 - "cd dir", 3 - "cd..", 4 - "dir" i 5 – izlaz.*/
 
-typedef enum _insertResult {
-	SUCCESS,
-	ALLOCATION_FAILED,
-	DUPLICATED_DIRECTORY
-}InsertResult;
+#define MAX 50
 
-struct _dir;
-typedef struct _dir *PositionDir;
-typedef struct _dir {
-	char name[MAX];
-	PositionDir sibling;
-	PositionDir child;
-}Dir;
+typedef struct _stablo {
+	char ime[MAX];
+	struct _stablo *child;
+	struct _stablo *sibling;
+}Stablo;
 
-struct _stack;
-typedef struct _stack *PositionStack;
-typedef struct _stack {
-	PositionDir dir;
-	PositionStack next;
-}Stack;
+typedef struct _stog {
+	Stablo *directory;
+	struct _stog *next;
+	struct _stog *prev;
+}Stog;
 
-InsertResult md(PositionDir current, char *name);
-PositionDir createDirectory(char *name);
-PositionDir findDirectory(PositionDir current, char *name);
-void PushDirectory(PositionStack stack, PositionDir dir);
-PositionDir popDirectory(PositionStack stack);
-void deleteTree(PositionDir current);
+int Menu(Stablo *Root, Stog *Head);
+int Linija(Stog *Head, Stablo *Root, Stablo *currentFile);
+Stog *PronadiPosljednji(Stog *Head);
+int MakeDir(Stablo *currentFile);
+Stablo *cd(Stablo *currentFile, Stog *Head);
+Stablo *Pronadi(char *name, Stablo *currentFile);
+int PushStog(Stog *Head, Stablo *directory);
+Stablo *Back(Stablo *currentFile, Stog *Head);
+Stablo *PopStog(Stog *Head);
+int Dir(Stablo *currentFile);
 
-
-int main()
+int main(void)
 {
-	PositionDir mainDir = NULL;
-	Stack stack;
-	PositionDir current = NULL;
+	Stablo *Root = (Stablo*)malloc(sizeof(Stablo));
+	Root->child = NULL;
+	Root->sibling = NULL;
 
-	mainDir = createDirectory("C:");
+	Stog *Head = (Stog*)malloc(sizeof(Stog));
+	Head->next = NULL;
+	Head->prev = NULL;
 
-	stack.next = NULL;
+	int status = 0;
 
-	current = &mainDir;
+	do {
+		status = Menu(Root, Head);
+	} while (!status);
 
-	//
-
-	deleteTree(mainDir);
-
-	return EXIT_SUCCESS;
+	return 0;
 }
-void deleteTree(PositionDir current) {
-	if (NULL == current) return;
+int Menu(Stablo *Root, Stog *Head) {
+	Stablo *CurrentFile = Root;
+	char command[MAX] = { 0 };
 
-	deleteTree(current->sibling);
-	deleteTree(current->child);
-	free(current);
-}
-void PushDirectory(PositionStack stack, PositionDir dir)
-{
-	PositionStack el = NULL;
+	printf("md <filename> - Dodaj novi direktorij\n");
+	printf("cd <filename> - Otvori direktorij\n");
+	printf("cd.. - Zatvoriti direktorij\n");
+	printf("dir - Ispisi listu direktorija u trenutnome direktoriju\n");
+	printf("refresh - Ponovo ispisi izbornik\n");
+	printf("exit - Izlaz\n");
 
-	el = (PositionStack)malloc(sizeof(Stack));
-	el->dir = dir;
+	while (1) {
+		Linija(Head, Root, CurrentFile);
+		scanf("%s", command);
 
-	el->next = stack->next;
-	stack->next = el;
-}
-PositionDir popDirectory(PositionStack stack)
-{
-	PositionDir result = NULL;
-	PositionStack first = stack->next;
-
-	if (first == NULL)return NULL;
-
-	result = first->dir;
-
-	stack->next = first->next;
-
-	free(first);
-	return result;
-}
-PositionDir findDirectory(PositionDir current, char *name)
-{
-	PositionDir child = current->child;
-
-	while (child != NULL && strcmp(child->name, name) != NULL) {
-		child = child->sibling;
+		if (!strcmp(command, "md")) {
+			MakeDir(CurrentFile);
+		}
+		else if (!strcmp(command, "cd")) {
+			CurrentFile = cd(CurrentFile, Head);
+		}
+		else if (!strcmp(command, "cd..")) {
+			CurrentFile = Back(CurrentFile, Head);
+		}
+		else if (!strcmp(command, "dir")) {
+			Dir(CurrentFile);
+		}
+		else if (!strcmp(command, "exit")) {
+			return 1;
+		}
+		else if (!strcmp(command, "refresh")) {
+			return 0;
+		}
+		else
+			printf("Naredba nije pronadena!\n");
 	}
-	return child;
+
+	return 0;
 }
-PositionDir createDirectory(char *name)
-{
-	PositionDir dir = NULL;
+int Linija(Stog *Head, Stablo *Root, Stablo *currentFile){
+	Stog* P;
 
-	dir = (PositionDir)malloc(sizeof(Dir));
+	P = PronadiPosljednji(Head);
 
-	if (dir == NULL) {
-		printf("Memory allocation fail\n");
+	if (Head->next == NULL) {
+		printf("%s>", Root->ime);
+		return 0;
+	}
+
+	while (P->prev != NULL) {
+		printf("%s>", P->directory->ime);
+		P = P->prev;
+	}
+
+	printf("%s>", currentFile->ime);
+
+	return 0;
+}
+Stog *PronadiPosljednji(Stog *Head){
+	Stog *P;;
+	P = Head->next;
+
+	if (P == NULL) {
 		return NULL;
 	}
 
-	strcpy(dir->name, name);
-	dir->sibling = NULL;
-	dir->child = NULL;
+	while (P->next != NULL) {
+		P = P->next;
+	}
+
+	return P;
 }
-InsertResult md(PositionDir current, char *name)
-{
-	PositionDir el = NULL;
-	PositionDir child = NULL;
+int MakeDir(Stablo *currentFile) {
+	Stablo* directory = (Stablo*)malloc(sizeof(Stablo));
 
-	if (findDirectory(current, name) != NULL) {
-		return DUPLICATED_DIRECTORY;
+	if (currentFile->child != NULL) {
+		currentFile = currentFile->child;
+		while (currentFile->sibling != NULL) {
+			currentFile = currentFile->sibling;
+		}
+		currentFile->sibling = directory;
+	}
+	else
+		currentFile->child = directory;
+
+	printf("Unesite ime direktorija: ");
+	scanf(" %s", directory->ime);
+
+	directory->sibling = NULL;
+	directory->child = NULL;
+
+	return 0;
+}
+Stablo *cd(Stablo *currentFile, Stog *Head){
+	Stablo *SearchedFile;
+	char imeDir[MAX];
+
+	printf("Koji direktorij zelite otvoriti: ");
+	scanf("%s", imeDir);
+
+	if (currentFile->child == NULL) {
+		printf("Nema direktorija koji mozete otvoriti!\n");
+		return currentFile;
 	}
 
-	el = createDirectory(name);
-
-	if (el == NULL) {
-		return ALLOCATION_FAILED;
+	SearchedFile = Pronadi(imeDir, currentFile);
+	if (SearchedFile == 0) {
+		printf("Direktorij nije pronaden\n");
+		return currentFile;
 	}
 
-	child = current->child;
+	PushStog(Head, currentFile);
 
-	if (current->child == NULL) {
-		current->child = el;
-		return SUCCESS;
+	return SearchedFile;
+}
+Stablo *Pronadi(char *name, Stablo *currentFile) {
+	if (currentFile->child == NULL) {
+		printf("Direktorij je prazan!");
+		return 0;
 	}
 
-	if (strcmp(child->name, el->name) > 0) {
-		current->child = el;
-		el->sibling = child;
-		return SUCCESS;
+	currentFile = currentFile->child;
+
+	while (strcmp(name, currentFile->ime) != 0 && currentFile->sibling != NULL) {
+		currentFile = currentFile->sibling;
 	}
 
-	while (child->sibling != NULL && strcmp(child->sibling->name, el->name) < 0) {
-		child = child->sibling;
+	if (currentFile->sibling == NULL) {
+		if (strcmp(name, currentFile->ime) != 0)
+			return 0;
+		else
+			return currentFile;
 	}
 
-	el->sibling = child->sibling;
-	child->sibling = el;
+	else
+		return currentFile;
+}
+int PushStog(Stog *Head, Stablo *directory) {
+	Stog *q = (Stog*)malloc(sizeof(Stog));
 
-	return SUCCESS;
+	q->next = Head->next;
+	q->prev = Head;
+	if (Head->next != NULL) {
+		Head->next->prev = q;
+	}
+	Head->next = q;
+	q->directory = directory;
+
+	return 0;
+}
+Stablo *Back(Stablo *currentFile, Stog *Head){
+	Stablo* SearchedFile;
+
+	SearchedFile = PopStog(Head);
+
+	if (SearchedFile == NULL) {
+		printf("Ne moze se izaci iz root direktorija!\n");
+		SearchedFile = currentFile;
+	}
+
+	return SearchedFile;
+}
+Stablo *PopStog(Stog *Head) {
+	Stog *q = (Stog*)malloc(sizeof(Stog));
+	Stablo *p;
+
+	if (Head->next == NULL)
+		return NULL;
+
+	q = Head->next;
+	p = q->directory;
+	Head->next = Head->next->next;
+	if (Head->next != NULL)
+		Head->next->prev = Head;
+	free(q);
+
+	return p;
+}
+int Dir(Stablo *currentFile) {
+	if (currentFile->child == NULL) {
+		printf("Prazan direktorij!\n");
+		return 0;
+	}
+
+	currentFile = currentFile->child;
+
+	printf("DIRECTORIES: \n");
+	printf("\t- %s\n", currentFile->ime);
+
+	while (currentFile->sibling != NULL) {
+		printf("\t- %s\n", currentFile->sibling->ime);
+		currentFile = currentFile->sibling;
+	}
+
+	return 0;
 }
